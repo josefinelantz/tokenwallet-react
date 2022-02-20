@@ -31,8 +31,10 @@ function ApproveToken(props) {
 
 				<div className="field is-grouped is-pulled-right is-offset">
                     <p className="control">
-                        <a className="button is-light" disabled={props.inProgress}
-                           onClick={() => props.closeTransfer()}>
+                        <a 
+                        className="button is-light" 
+                        disabled={props.inProgress}
+                        onClick={() => props.closeTransfer()}>
                             Back
                         </a>
                     </p>

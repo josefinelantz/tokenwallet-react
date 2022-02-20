@@ -166,15 +166,18 @@ class App extends Component {
     })
 	  window.location.reload();	
   };
-
+  // Transfer method is used to transfer token between Ethereum addresses.
   Transfer = () => {
+    // Set inProgress state variable to true. Child components can recognize that the current state is a transfer in progress.
     this.setState({
       inProgress: true
     });
 		
-	//this.web3.eth.defaultAccount = window.web3.defaultAccount;
-		
+    // Set default account
+	  this.web3.eth.defaultAccount = window.web3.defaultAccount;
+		// Initialize contract object 
     var contract;
+    // Check whether token is ERC20 or ERC721 by checking transferDetail state variable for metadata == ERC721. 
 		if (this.state.fields.metadata) {
 		 	contract = new this.web3.eth.Contract(this.state.transferDetail721.abi,this.state.transferDetail721.address);
 		} else {
@@ -182,20 +185,20 @@ class App extends Component {
 		}
 		
 		let app = this; 
-		var metadata;
-		var tokenId;
-		var amount;
-		
+		let metadata;
+		let tokenId;
+		let amount;
+		// Assign state variable values to local variables.
 		if(this.state.fields.metadata) {
 		 	metadata = this.state.fields.metadata;
-		 	tokenId = this.state.fields.tokenid;
+		 	tokenId = this.state.fields.tokenId;
 		} else {
 			amount = this.state.fields.amount*(Math.pow(10,this.state.transferDetail20.decimal));			
 		}	
     
     let receiver = this.state.fields.receiver.toString();
 		let account = this.state.account;
-        
+    // If metadata is stored call transferNFT method. 
 		if(metadata) { 
 			contract.methods.transferNFT(account,receiver, tokenId, metadata).send({from: this.web3.eth.defaultAccount}).then(function(response,err) {	
 				if(response) {
@@ -206,12 +209,14 @@ class App extends Component {
 						tx721: response.tx721,
             inProgress: false
           });
- 				}else	{
+ 				} else	{
           console.log(err);
         }
 			});
 		} else {
+      // No metadata stored call transfer method.
 			contract.methods.transfer(receiver, amount).send({from: this.web3.eth.defaultAccount}).then(function(response,err) {
+        // Successful respons, reset App which resets the state variables and sets inProgress to false. 
 				if(response) {
           console.log(response);
  	        app.resetApp();
@@ -226,13 +231,13 @@ class App extends Component {
       });
 		}	    
 	};
-    
+  // Similar til Tranfer, but is invoked when user clicks the mint button. 
   Mint = () => {
     this.setState({
       inProgress: true
     });
 		
-		//this.web3.eth.defaultAccount = window.web3.defaultAccount;
+		this.web3.eth.defaultAccount = window.web3.defaultAccount;
 		
     var contract;
 		if (this.state.fields.metadata) {
@@ -242,8 +247,8 @@ class App extends Component {
 		}
 		
     let app = this; 
-		var metadata;
-		var amount;
+		let metadata;
+		let amount;
 		
 		if(this.state.fields.metadata) {
 		 metadata = this.state.fields.metadata;
@@ -252,8 +257,7 @@ class App extends Component {
 		}	
         
     let receiver = this.state.fields.receiver.toString();
-		
-        		
+		// If ERC721 call createNFT in Condos contract.		
 		if(metadata) {
 			contract.methods.createNFT(receiver, metadata).send({from: this.web3.eth.defaultAccount}).then(function(response) {
         if(response) {
@@ -281,16 +285,18 @@ class App extends Component {
       });
 		}    
 	};
-  
+  // Checks whether the user is approving an ERC20 token or an ERC721 token. 
   Approve = () => {
     this.setState({
       inProgress: true
     });
 		
-    var contract;
+    let contract;
+    // If ERC721 send tokenId and the account to approve.
 		if (this.state.approveDetail721.abi) {
 		  contract = new this.web3.eth.Contract(this.state.approveDetail721.abi,this.state.approveDetail721.address);	
 		} else {
+      // If ERC20 send account and balance to approve.
       contract = new this.web3.eth.Contract(this.state.approveDetail20.abi,this.state.approveDetail20.address);
 		}
 
@@ -311,7 +317,7 @@ class App extends Component {
         }
       });
 		} else {
-		  let tokenid = this.state.fields.tokenid;
+		  let tokenid = this.state.fields.tokenId;
 		  contract.methods.approve(receiver, tokenid).send({from: this.web3.eth.defaultAccount}).then(function(response) {
 			  if(response) {
           console.log(response);
@@ -335,27 +341,34 @@ class App extends Component {
   };
   // Tasks to carry out after App is rendered.
   componentDidMount(){
-		var account;
+		let account;
+    // Post November 2018 MetaMask does not inject the Ethereum provider with user accounts by default. To access user accounts DApp must asynchronously call the Ethereum.enable() method. 
+    // Hence, we first check wether the window.Ethereum object is available. 
 		if (window.ethereum) {
       const ethereum = window.ethereum;
+      // To provide compatability with legacy code, map the window.Ethereum object to window.web3. Also map to window.Ethereum i.e current provider. 
       window.web3 = new Web3(ethereum);
 	    this.web3 = new Web3(ethereum);
+      // Async call MetaMask to ask for permission to the injected Ethereum provider with user accounts. 
 		  ethereum.enable().then((accounts) => {
 		    account = accounts[0];
  		    this.web3.eth.defaultAccount = account;
+        // Initialize this for the app.
 		    let app = this;
-		
+        // Set account state variable to the default account. 
 		    this.setState({
           account
         });
-
+        // Call setNetwork to set Navbar to local blockchain.
         this.setNetwork();
+        // Get default gasprice for Navbar.
         this.setGasPrice();
-        
+        // Loop through tokens listed in all20.js, for each token we set contract parameter using its ABI and address. 
         Tokens20.forEach((token) => {
           let erc20Token = new this.web3.eth.Contract(token.abi,token.address);
-			
+          // Get balance for each token for the default account. 
           erc20Token.methods.balanceOf(account).call().then(function(response) {
+            // Get all other params from token's component file. 
             if(response) {
               let decimal = token.decimal;
               let precision = '1e' + decimal;
@@ -384,9 +397,10 @@ class App extends Component {
             }
           });
         });
-		
+        // Loop through tokens available in all721.js.  
 		    Tokens721.forEach((token721) => {
           let erc721Token = new this.web3.eth.Contract(token721.abi,token721.address);
+          //Fetch tokenId and the mapped metadata for each token from the public hashmap MDTrack in ERC721 contract.
           erc721Token.methods.MDTrack(account).call().then(function (response) {
 				if(response) {
           let name = token721.name;
@@ -425,7 +439,9 @@ class App extends Component {
 }						   
 
 render() {
+  // Check if the app can detect a web3 instance.
   if(this.isWeb3) {   
+    // If web3 instance the app renders and sends the state parameters to the Container component, which then redistributes it beteween the child components. 
     return (
       <div>
         <Nav appName={this.appName} network={this.state.network} />
@@ -461,6 +477,7 @@ render() {
       </div>
     )
   } else {
+    // If unable to detect a web3 instance, show notification to user to install MM.
     return(
       <InstallMetamask />
     )
