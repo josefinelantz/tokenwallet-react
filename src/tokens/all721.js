@@ -1,6 +1,6 @@
 /* Component for mapping ERC721 tokens to contract ABI.
 */
-import Condos from "../contracts/Condos";
+import Condos from "./Condos";
 const Tokens721 = [
 	Condos
 ];

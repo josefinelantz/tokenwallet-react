@@ -174,9 +174,10 @@ class App extends Component {
     });
 		
     // Set default account
-	  this.web3.eth.defaultAccount = window.web3.defaultAccount;
-		// Initialize contract object 
-    var contract;
+	  //this.web3.eth.defaultAccount = window.web3.defaultAccount;
+		
+    // Initialize contract object 
+    let contract;
     // Check whether token is ERC20 or ERC721 by checking transferDetail state variable for metadata == ERC721. 
 		if (this.state.fields.metadata) {
 		 	contract = new this.web3.eth.Contract(this.state.transferDetail721.abi,this.state.transferDetail721.address);
@@ -231,15 +232,15 @@ class App extends Component {
       });
 		}	    
 	};
-  // Similar til Tranfer, but is invoked when user clicks the mint button. 
+  // Similar to Tranfer, but is invoked when user clicks the mint button. 
   Mint = () => {
     this.setState({
       inProgress: true
     });
 		
-		this.web3.eth.defaultAccount = window.web3.defaultAccount;
+		//this.web3.eth.defaultAccount = window.web3.defaultAccount;
 		
-    var contract;
+    let contract;
 		if (this.state.fields.metadata) {
 		  contract = new this.web3.eth.Contract(this.state.mintDetail721.abi, this.state.mintDetail721.address);
 		} else {
@@ -365,7 +366,7 @@ class App extends Component {
         this.setGasPrice();
         // Loop through tokens listed in all20.js, for each token we set contract parameter using its ABI and address. 
         Tokens20.forEach((token) => {
-          let erc20Token = new this.web3.eth.Contract(token.abi,token.address);
+          let erc20Token = new this.web3.eth.Contract(token.abi, token.address);
           // Get balance for each token for the default account. 
           erc20Token.methods.balanceOf(account).call().then(function(response) {
             // Get all other params from token's component file. 
@@ -399,7 +400,7 @@ class App extends Component {
         });
         // Loop through tokens available in all721.js.  
 		    Tokens721.forEach((token721) => {
-          let erc721Token = new this.web3.eth.Contract(token721.abi,token721.address);
+          let erc721Token = new this.web3.eth.Contract(token721.abi, token721.address);
           //Fetch tokenId and the mapped metadata for each token from the public hashmap MDTrack in ERC721 contract.
           erc721Token.methods.MDTrack(account).call().then(function (response) {
 				if(response) {

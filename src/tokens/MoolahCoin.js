@@ -1,9 +1,9 @@
 export default {
-	address: "0x5f536d47184b2c61a8eABe63BaB3A60ff18d20B1",
+	address: "0x1d4e49a8082d35FD2e0377317D71AEB6Cb4827a1",
 	decimal: 0,
 	name: "MoolahCoin",
-	symbol: MC,
-	icon: "MC.jpg",
+	symbol: "MC",
+	icon: "MCCoin.png",
 	abi: [
     {
       "inputs": [],

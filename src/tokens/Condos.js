@@ -1,8 +1,8 @@
 export default {
-	address:"0x578f6D88D1C6105057eead3CC32bFf3F6CEABDb0",
+	address:"0x02c132fDec09FA5e2910cFe8eE691E770A080a02",
 	decimal: 0,
-	name: "Condos",
-	icon: "Condos.jpg",
+	name: "CONDO",
+	icon: "Condos.jpeg",
 	abi: [
     {
       "inputs": [],

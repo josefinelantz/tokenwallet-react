@@ -35,7 +35,7 @@ class Container extends Component {
                   />
                   <TransferToken 
                     closeTransfer={this.props.closeTransfer}
-                    transferDetail20={this.	props.transferDetail20}
+                    transferDetail20={this.props.transferDetail20}
                     fields={this.props.fields}
                     account={this.props.account}
                     Transfer={this.props.Transfer}
